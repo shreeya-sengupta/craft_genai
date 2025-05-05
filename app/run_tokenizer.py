@@ -17,7 +17,10 @@ status = st.radio('Select Tokenizer: ',
 if(status == 'BPE'):
     # take height input in centimeters
     try:
-        tokens = apply_bpe(text_to_tokenize, learned_merges)
+    	words = text_to_tokenize.split()
+    	tokens = [apply_bpe(word, learned_merges) for word in words]
+    	# for word, tkns in zip(words, tokens):
+    	# 	print(f"{word:8} => {' '.join(tkns)}")
     except:
         st.text("select a tokenizer")
 
@@ -26,4 +29,3 @@ if(st.button('Tokenize')):
 
     # print the BMI INDEX
     st.text("tokens {}.".format(tokens))
-
