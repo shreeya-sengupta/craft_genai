@@ -6,7 +6,7 @@ import imageio
 import os
 
 # Initialize a zero-shot classification pipeline for topic/keyword detection
-classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
+classifier = pipeline("zero-shot-classification", model="<model_name>")
 
 # emoji_map = {emoji.demojize(v.get('en')).strip(":") : v.get('en') for k, v in emoji.EMOJI_DATA.items()}
 emoji_map = {}
