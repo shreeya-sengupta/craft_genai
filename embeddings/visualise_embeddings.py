@@ -66,7 +66,7 @@ if text_to_visualise:
     # --------------------------
     # Similarity Calculation
     # --------------------------
-    similarity_matrix = cosine_similarity(embeddings)
+    similarity_matrix = embedding_model.similarity(embeddings, embeddings)
     df_sim = pd.DataFrame(similarity_matrix, index=texts, columns=texts)
 
     # Let user choose a reference text
@@ -231,7 +231,7 @@ if text_to_visualise:
             if st.button("Compare Similarity"):
                 a_emb = embedding_model.encode([text_a])
                 b_emb = embedding_model.encode([text_b])
-                sim_pair = cosine_similarity(a_emb, b_emb)[0][0]
+                sim_pair = embedding_model.similarity(a_emb, b_emb)[0][0]
                 st.markdown(f"**Similarity Score:** `{sim_pair:.3f}`")
                 bar_color = "green" if sim_pair > 0.7 else "orange" if sim_pair > 0.4 else "red"
                 st.spinner("in progress")
