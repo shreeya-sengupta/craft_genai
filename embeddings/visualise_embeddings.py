@@ -2,8 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
+from sentence_transformers import SentenceTransformer, util
 from sklearn.cluster import KMeans
 from collections import Counter
 
@@ -150,16 +149,19 @@ if text_to_visualise:
         query = st.text_input("Type a query to find semantically similar texts:")
 
         if query:
-            q_emb = embedding_model.encode([query])
-            sims = cosine_similarity(q_emb, embeddings)[0]
-            top_idx = np.argsort(sims)[::-1][:10]
+            q_emb = embedding_model.encode(query, convert_to_tensor=True)
+            embeddings = embedding_model.encode(texts, convert_to_tensor=True)
+            sims = util.cos_sim(q_emb, embeddings)[0]            
+            print(sims)
+            top_idx = np.argsort(sims.cpu().numpy())[::-1][:10]
 
             st.markdown("Top 10 Most Similar Sentences")
             st.caption("Higher similarity → more semantically related to your query")
 
             # Create color-coded similarity bars
             for rank, i in enumerate(top_idx):
-                sim_score = sims[i]
+                sim_score = float(sims[i])
+                sim_score = max(0.0, min(sim_score, 1.0))
                 color_intensity = int(sim_score * 255)
                 bg_color = f"rgba(0, 128, 255, {sim_score})"
                 st.markdown(
@@ -183,7 +185,7 @@ if text_to_visualise:
             st.markdown("### Similarity Distribution")
             df_similar = pd.DataFrame({
                 "Text": [texts[i] for i in top_idx],
-                "Similarity": [sims[i] for i in top_idx]
+                "Similarity": [float(sims[i]) for i in top_idx]
             })
             fig_similar = px.bar(
                 df_similar,
@@ -197,7 +199,7 @@ if text_to_visualise:
             st.plotly_chart(fig_similar, use_container_width=True)
 
             # Calculate top similarities
-            top_sims = [sims[i] for i in top_idx[:5]]
+            top_sims = [float(sims[i]) for i in top_idx[:5]]
             avg_sim = np.mean(top_sims)
             max_sim = np.max(top_sims)
             min_sim = np.min(top_sims)
@@ -242,13 +244,13 @@ if text_to_visualise:
     # TAB 3: Similarity Heatmap
     # --------------------------
     with tab3:
-        st.subheader("Cosine Similarity Heatmap")
+        st.subheader("Similarity Heatmap")
         fig_heatmap = px.imshow(
             df_sim,
             x=texts,
             y=texts,
             color_continuous_scale="Viridis",
-            title="Cosine Similarity Matrix",
+            title="Similarity Matrix",
             aspect="auto"
         )
         st.plotly_chart(fig_heatmap, use_container_width=True)
