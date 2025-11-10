@@ -177,8 +177,7 @@ if text_to_visualise:
                         <b>#{rank+1}</b> — {texts[i]}  
                         <span style="float:right;"> {sim_score:.3f}</span>
                     </div>
-                    """,
-                    unsafe_allow_html=True
+                    """
                 )
 
             # Plot similarity distribution
